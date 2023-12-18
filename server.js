@@ -1,6 +1,7 @@
 const grpc = require('@grpc/grpc-js');
 const axios = require('axios');
 const protoLoader = require('@grpc/proto-loader');
+const express = require('express');
 
 // Load proto file using @grpc/proto-loader
 const packageDefinition = protoLoader.loadSync('./proto/api.proto', {
@@ -15,6 +16,7 @@ const packageDefinition = protoLoader.loadSync('./proto/api.proto', {
 const apiProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
+const App = express();
 
 server.addService(apiProto.ApiService.service, {
     GetMahasiswaInfoAll: async (_, callback) => {
@@ -45,8 +47,24 @@ server.addService(apiProto.ApiService.service, {
   },
 });
 
-const PORT = 50051;
-server.bindAsync(`localhost:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  server.start();
+// const PORT = 50051;
+// server.bindAsync(`localhost:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
+//   console.log(`Server running at http://localhost:${PORT}`);
+//   server.start();
+// });
+
+const PORT_HTTP = 3000;
+App.get('/api/mahasiswa-info-all', async (req, res) => {
+  try {
+    const response = await axios.get(`http://registrasi.digitalevent.id/api/mahasiswa-registrasi/`);
+    const responseData = response.data.data;
+    res.json({ mahasiswas: responseData });
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+App.listen(PORT_HTTP, () => {
+  console.log(`HTTP Server running at http://localhost:${PORT_HTTP}`);
 });
