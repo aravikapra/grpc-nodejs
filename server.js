@@ -53,7 +53,7 @@ server.addService(apiProto.ApiService.service, {
 //   server.start();
 // });
 
-const PORT_HTTP = 3000;
+const PORT_HTTP = 50051;
 App.get('/api/mahasiswa-info-all', async (req, res) => {
   try {
     const response = await axios.get(`http://registrasi.digitalevent.id/api/mahasiswa-registrasi/`);
